@@ -89,10 +89,10 @@ export default defineComponent({
         messages(): TMessage[] {
             return this.currentRoom?.messages ?? [];
         },
-        broadcastChannelRoom() {
+        broadcastChannelRoom(): BroadcastChannel {
             return new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this.roomId}`);
         },
-        broadcastChannelRooms() {
+        broadcastChannelRooms(): BroadcastChannel {
             return new BroadcastChannel(CHANNEL_NAME_ROOMS);
         },
 
