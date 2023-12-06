@@ -15,6 +15,7 @@ const broadcastChannelPlugin: Plugin = ({ app }) => {
                 switch (data.type) {
                     case TypeChannelRooms.REMOVE:
                         console.log("remove room :", data.data);
+                        debugger
                         app.store?.dispatch('removeRoom', data.data)
                         break;
                     case TypeChannelRooms.ADD:

@@ -57,7 +57,7 @@ export const mutations: MutationTree<RootState> = {
         if (state.rooms[roomId]) {
             state.rooms[roomId].users = users;
             if (users.length <= 1) {
-                // debugger
+                debugger
                 delete state.rooms[roomId];
             }
 
