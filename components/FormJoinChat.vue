@@ -16,8 +16,8 @@
   
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { CHANNEL_NAME_ROOM, CHANNEL_NAME_ROOMS, TypeChannelRoom, TypeChannelRooms } from '~/constants';
-import { TMessageBroadCast, TRoom } from '~/types';
+import { CHANNEL_NAME_ROOMS, TypeChannelRooms } from '~/constants';
+import { TRoom } from '~/types';
 
 export default defineComponent({
     data() {
@@ -54,22 +54,28 @@ export default defineComponent({
                 const idRoom = this.formJoin.roomName.replaceAll(" ", "_");
                 const roomExists = this.$store.state.rooms[idRoom];
                 const newRoom: TRoom = { ...roomExists, id: idRoom, name: this.formJoin.roomName, users: [...(roomExists?.users ?? []), { userName }] }
+                debugger
                 this.$store.dispatch('addUserInRoom', newRoom).then(() => {
-                    if (roomExists) {
-                        const channel = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${roomName}`);
-                        const dataPostMessage: TMessageBroadCast<{ room: TRoom, userName: string }> = {
-                            type: TypeChannelRoom.JOIN,
-                            data: { room: newRoom, userName }
-                        }
-                        channel.postMessage(dataPostMessage)
-                    } else {
-                        const channelRooms = new BroadcastChannel(CHANNEL_NAME_ROOMS)
-                        channelRooms.postMessage({
-                            type: TypeChannelRooms.ADD,
-                            data: newRoom
-                        })
-                    }
-
+                    // if (roomExists) {
+                    //     const channel = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${roomName}`);
+                    //     const dataPostMessage: TMessageBroadCast<{ room: TRoom, userName: string }> = {
+                    //         type: TypeChannelRoom.JOIN,
+                    //         data: { room: newRoom, userName }
+                    //     }
+                    //     channel.postMessage(dataPostMessage)
+                    // } else {
+                    //     const channelRooms = new BroadcastChannel(CHANNEL_NAME_ROOMS)
+                    //     channelRooms.postMessage({
+                    //         type: TypeChannelRooms.ADD,
+                    //         data: newRoom
+                    //     })
+                    // }
+                    const channelRooms = new BroadcastChannel(CHANNEL_NAME_ROOMS)
+                    channelRooms.postMessage({
+                        type: TypeChannelRooms.ADD,
+                        data: newRoom
+                    });
+                    debugger
                     (this.$router as any).push("/room/" + roomName + "?username=" + userName)
                         (this.$refs.formJoin as any).resetFields();
                 });

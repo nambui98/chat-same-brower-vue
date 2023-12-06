@@ -22,7 +22,7 @@ export const mutations: MutationTree<RootState> = {
             id: room.id,
             name: room.name,
             users: room.users,
-            messages: [],
+            messages: room.messages,
         };
         state.rooms = { ...state.rooms };
     },
@@ -37,14 +37,17 @@ export const mutations: MutationTree<RootState> = {
         };
     },
     ADD_MESSAGE_ROOMS(state, { roomId, message }: { roomId: TRoom['id'], message: TMessage }) {
+        debugger
         const currentRoom = state.rooms[roomId];
         state.rooms[roomId] = {
             ...currentRoom,
-            messages: [...currentRoom.messages, message]
+            messages: [...(currentRoom.messages ?? []), message]
         };
         state.rooms = { ...state.rooms };
     },
     ADD_MESSAGE(state, { roomId, message }) {
+
+        debugger
         state.rooms[roomId].messages.push(message);
         state.rooms = { ...state.rooms };
     },
@@ -53,6 +56,7 @@ export const mutations: MutationTree<RootState> = {
         if (state.rooms[roomId]) {
             state.rooms[roomId].users = users;
             if (users.length <= 1) {
+                // debugger
                 delete state.rooms[roomId];
             }
 
@@ -67,7 +71,7 @@ export const actions: ActionTree<RootState, RootState> = {
         commit('ADD_ROOM', room)
     },
     removeRoom({ commit }, roomId: TRoom['id']) {
-        commit('ADD_ROOM', roomId)
+        commit('REMOVE_ROOM', roomId)
     },
     addMessageRooms({ commit }, data: { roomId: TRoom['id'], message: TMessage }) {
         commit('ADD_MESSAGE_ROOMS', data)

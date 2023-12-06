@@ -37,6 +37,8 @@
                 </el-form-item>
             </el-form>
         </el-footer>
+
+        <p>{{ usersInRoom?.length }}</p>
         <Footer />
     </div>
 </template> 
@@ -81,6 +83,9 @@ export default defineComponent<any>({
         usersInRoom(): TUser[] | undefined {
             return this.currentRoom?.users;
         },
+        checkUserExists(): boolean {
+            return this.usersInRoom?.some((user: TUser) => user.userName === this.currentUsername);
+        },
         messages(): TMessage[] {
             return this.currentRoom?.messages ?? [];
         },
@@ -93,8 +98,15 @@ export default defineComponent<any>({
 
     },
     watch: {
-        usersInRoom(newVal: TUser[] | undefined, oldVal: TUser[]) {
-            if ((newVal?.length === 0 || !!newVal === false) && oldVal?.length === 2) {
+        // usersInRoom(newVal: TUser[] | undefined, oldVal: TUser[]) {
+
+        //     debugger
+        //     if ((newVal?.length === 0 || !!newVal === false) && oldVal?.length === 2 || (newVal && newVal.findIndex((user) => user.userName === this.currentUsername) < 0)) {
+        //         this.$router.push('/'); // Chuyển hướng đến '/page1'
+        //     }
+        // },
+        checkUserExists(newVal: boolean, oldVal: boolean) {
+            if (!newVal && oldVal) {
                 this.$router.push('/'); // Chuyển hướng đến '/page1'
             }
         }
@@ -108,18 +120,22 @@ export default defineComponent<any>({
     created() {
         if (process.client) {
             if (typeof BroadcastChannel !== 'undefined') {
-                const broadcastChannelRoom = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this?.roomId}`)
+                // const broadcastChannelRoom = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this?.roomId}`)
 
                 // this.broadcastChannelRoom = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this.roomId}`);
-                broadcastChannelRoom.addEventListener('message', this.handleRoomEvent);
+                this.broadcastChannelRoom.addEventListener('message', this.handleRoomEvent);
             }
         }
     },
     beforeDestroy() {
-        this.leaveRoom();
 
-        const broadcastChannelRoom = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this?.roomId}`)
-        broadcastChannelRoom.removeEventListener('message', this.handleRoomEvent);
+        this.broadcastChannelRoom.removeEventListener('message', this.handleRoomEvent);
+        if (this.checkUserExists) {
+
+            // this.leaveRoom();
+        }
+
+        // const broadcastChannelRoom = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this?.roomId}`)
     },
     methods: {
         openMessageNotice(userName: string) {
@@ -133,19 +149,24 @@ export default defineComponent<any>({
             const message: TMessageBroadCast<any> = event.data;
             switch (message.type) {
                 case TypeChannelRoom.JOIN:
-                    this.openMessageNotice(message.data.userName);
+                    if (message.data.user.userName !== this.currentUsername) {
+                        this.openMessageNotice(message.data.userName);
+                    }
+                    debugger
                     this.$store.dispatch("addUserInRoom", message.data.room)
                     break;
                 case TypeChannelRoom.MESSAGE:
                     this.$store.dispatch("addMessage", message.data)
                     break;
                 case TypeChannelRoom.LEAVE:
-                    this.$message({
-                        showClose: true,
-                        message: `${message.data.user.userName} has left the chat room`,
-                        type: 'warning'
-                    });
-                    this.$store.dispatch("leaveRoom", message.data)
+                    if (message.data.user.userName !== this.currentUsername) {
+                        this.$message({
+                            showClose: true,
+                            message: `${message.data.user.userName} has left the chat room`,
+                            type: 'warning'
+                        });
+                        this.$store.dispatch("leaveRoom", message.data)
+                    }
                     break;
                 case TypeChannelRoom.REMOVE:
                     this.$router.push("/")
@@ -164,11 +185,7 @@ export default defineComponent<any>({
                 data: this.roomId ?? ''
             }
             this.$store.dispatch("leaveRoom", dataChannelRoom.data).then(() => {
-                this.$router.replace("/");
-
-                const broadcastChannelRoom = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this?.roomId}`)
-                broadcastChannelRoom?.postMessage(dataChannelRoom)
-
+                this.broadcastChannelRoom?.postMessage(dataChannelRoom)
                 this.broadcastChannelRooms.postMessage(dataChannelRooms)
             })
 
