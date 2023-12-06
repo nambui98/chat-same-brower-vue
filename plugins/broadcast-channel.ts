@@ -23,6 +23,9 @@ const broadcastChannelPlugin: Plugin = ({ app }) => {
                         debugger
                         app.store?.dispatch('addMessageRooms', data.data)
                         break;
+                    case TypeChannelRooms.USER_LEAVE:
+                        app.store?.dispatch('leaveRoom', data.data)
+                        break;
                     default:
                         break;
                 }

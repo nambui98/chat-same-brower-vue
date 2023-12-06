@@ -187,9 +187,21 @@ export default defineComponent<any>({
             }
             this.$store.dispatch("leaveRoom", dataChannelRoom.data).then(() => {
                 this.broadcastChannelRoom?.postMessage(dataChannelRoom)
-                this.broadcastChannelRooms.postMessage(dataChannelRooms)
-            })
 
+                if (this.usersInRoom.length <= 2) {
+                    this.broadcastChannelRooms.postMessage(dataChannelRooms)
+                }
+            })
+            // const dataChannelRooms: TMessageBroadCastRooms<{ user: TUser, roomId: TRoom['id'] }> = {
+            //                 type: TypeChannelRooms.USER_LEAVE,
+            //                 data: { user: { userName: this.currentUsername }, roomId: this.roomId ?? '' }
+            //             }
+            //             this.$store.dispatch("leaveRoom", dataChannelRoom.data).then(() => {
+            //                 this.broadcastChannelRoom?.postMessage(dataChannelRoom)
+            //                 if (this.usersInRoom.length <= 2) {
+            //                     this.broadcastChannelRooms.postMessage(dataChannelRooms)
+            //                 }
+            //             })
         },
 
         sendMessage() {

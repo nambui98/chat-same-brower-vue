@@ -9,5 +9,6 @@ export enum TypeChannelRoom {
 export enum TypeChannelRooms {
     ADD,
     REMOVE,
-    ADD_MESSAGE
+    ADD_MESSAGE,
+    USER_LEAVE
 }
