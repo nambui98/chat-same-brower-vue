@@ -53,6 +53,7 @@ export const mutations: MutationTree<RootState> = {
     },
     LEAVE_ROOM(state, { roomId, user }: { roomId: string, user: TUser }) {
         const users = state.rooms[roomId]?.users.filter(u => u.userName !== user.userName);
+        debugger
         if (state.rooms[roomId]) {
             state.rooms[roomId].users = users;
             if (users.length <= 1) {
@@ -83,6 +84,7 @@ export const actions: ActionTree<RootState, RootState> = {
         commit('ADD_MESSAGE', data)
     },
     leaveRoom({ commit }, data: { user: TUser, roomId: TRoom['id'] }) {
+        debugger
         commit('LEAVE_ROOM', data)
     },
 

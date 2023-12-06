@@ -149,11 +149,12 @@ export default defineComponent<any>({
             const message: TMessageBroadCast<any> = event.data;
             switch (message.type) {
                 case TypeChannelRoom.JOIN:
-                    if (message.data.user.userName !== this.currentUsername) {
+                    debugger
+                    if (message.data.userName !== this.currentUsername) {
                         this.openMessageNotice(message.data.userName);
                     }
-                    debugger
-                    this.$store.dispatch("addUserInRoom", message.data.room)
+                    // debugger
+                    // this.$store.dispatch("addUserInRoom", message.data.room)
                     break;
                 case TypeChannelRoom.MESSAGE:
                     this.$store.dispatch("addMessage", message.data)

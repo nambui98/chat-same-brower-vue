@@ -16,8 +16,8 @@
   
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { CHANNEL_NAME_ROOMS, TypeChannelRooms } from '~/constants';
-import { TRoom } from '~/types';
+import { CHANNEL_NAME_ROOM, CHANNEL_NAME_ROOMS, TypeChannelRoom, TypeChannelRooms } from '~/constants';
+import { TMessageBroadCast, TRoom } from '~/types';
 
 export default defineComponent({
     data() {
@@ -75,7 +75,15 @@ export default defineComponent({
                         type: TypeChannelRooms.ADD,
                         data: newRoom
                     });
+                    const channel = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${idRoom}`);
+                    const dataPostMessage: TMessageBroadCast<{ room: TRoom, userName: string }> = {
+                        type: TypeChannelRoom.JOIN,
+                        data: { room: newRoom, userName }
+                    }
+                    channel.postMessage(dataPostMessage)
+
                     debugger
+
                     (this.$router as any).push("/room/" + roomName + "?username=" + userName)
                         (this.$refs.formJoin as any).resetFields();
                 });
