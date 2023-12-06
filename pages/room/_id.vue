@@ -49,7 +49,7 @@ import { TMessageBroadCast, TMessageBroadCastRooms, TMessage, TRoom, TUser } fro
 
 
 
-export default defineComponent<any>({
+export default defineComponent({
     asyncData({ params }) {
         const id = params.id;
         return { id }
@@ -83,7 +83,7 @@ export default defineComponent<any>({
         usersInRoom(): TUser[] | undefined {
             return this.currentRoom?.users;
         },
-        checkUserExists(): boolean {
+        checkUserExists(): boolean | undefined {
             return this.usersInRoom?.some((user: TUser) => user.userName === this.currentUsername);
         },
         messages(): TMessage[] {
@@ -188,7 +188,7 @@ export default defineComponent<any>({
             this.$store.dispatch("leaveRoom", dataChannelRoom.data).then(() => {
                 this.broadcastChannelRoom?.postMessage(dataChannelRoom)
 
-                if (this.usersInRoom.length <= 2) {
+                if (this.usersInRoom && this.usersInRoom?.length <= 2) {
                     this.broadcastChannelRooms.postMessage(dataChannelRooms)
                 }
             })
