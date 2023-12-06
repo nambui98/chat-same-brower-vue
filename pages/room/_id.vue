@@ -98,13 +98,6 @@ export default defineComponent({
 
     },
     watch: {
-        // usersInRoom(newVal: TUser[] | undefined, oldVal: TUser[]) {
-
-        //     debugger
-        //     if ((newVal?.length === 0 || !!newVal === false) && oldVal?.length === 2 || (newVal && newVal.findIndex((user) => user.userName === this.currentUsername) < 0)) {
-        //         this.$router.push('/'); // Chuyển hướng đến '/page1'
-        //     }
-        // },
         checkUserExists(newVal: boolean, oldVal: boolean) {
             if (!newVal && oldVal) {
                 this.$router.push('/'); // Chuyển hướng đến '/page1'
@@ -120,22 +113,15 @@ export default defineComponent({
     created() {
         if (process.client) {
             if (typeof BroadcastChannel !== 'undefined') {
-                // const broadcastChannelRoom = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this?.roomId}`)
-
-                // this.broadcastChannelRoom = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this.roomId}`);
                 this.broadcastChannelRoom.addEventListener('message', this.handleRoomEvent);
             }
         }
     },
     beforeDestroy() {
-
         this.broadcastChannelRoom.removeEventListener('message', this.handleRoomEvent);
         if (this.checkUserExists) {
-
-            // this.leaveRoom();
+            this.leaveRoom();
         }
-
-        // const broadcastChannelRoom = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${this?.roomId}`)
     },
     methods: {
         openMessageNotice(userName: string) {
@@ -149,12 +135,9 @@ export default defineComponent({
             const message: TMessageBroadCast<any> = event.data;
             switch (message.type) {
                 case TypeChannelRoom.JOIN:
-                    debugger
                     if (message.data.userName !== this.currentUsername) {
                         this.openMessageNotice(message.data.userName);
                     }
-                    // debugger
-                    // this.$store.dispatch("addUserInRoom", message.data.room)
                     break;
                 case TypeChannelRoom.MESSAGE:
                     this.$store.dispatch("addMessage", message.data)
@@ -187,21 +170,11 @@ export default defineComponent({
             }
             this.$store.dispatch("leaveRoom", dataChannelRoom.data).then(() => {
                 this.broadcastChannelRoom?.postMessage(dataChannelRoom)
-
-                if (this.usersInRoom && this.usersInRoom?.length <= 2) {
+                if (this.usersInRoom && this.usersInRoom?.length <= 1) {
                     this.broadcastChannelRooms.postMessage(dataChannelRooms)
                 }
             })
-            // const dataChannelRooms: TMessageBroadCastRooms<{ user: TUser, roomId: TRoom['id'] }> = {
-            //                 type: TypeChannelRooms.USER_LEAVE,
-            //                 data: { user: { userName: this.currentUsername }, roomId: this.roomId ?? '' }
-            //             }
-            //             this.$store.dispatch("leaveRoom", dataChannelRoom.data).then(() => {
-            //                 this.broadcastChannelRoom?.postMessage(dataChannelRoom)
-            //                 if (this.usersInRoom.length <= 2) {
-            //                     this.broadcastChannelRooms.postMessage(dataChannelRooms)
-            //                 }
-            //             })
+
         },
 
         sendMessage() {

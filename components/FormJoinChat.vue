@@ -52,24 +52,23 @@ export default defineComponent({
                 await (this.$refs?.formJoin as any).validate();
                 const { roomName, userName } = this.formJoin;
                 const idRoom = this.formJoin.roomName.replaceAll(" ", "_");
-                const roomExists = this.$store.state.rooms[idRoom];
-                const newRoom: TRoom = { ...roomExists, id: idRoom, name: this.formJoin.roomName, users: [...(roomExists?.users ?? []), { userName }] }
-                debugger
+                const roomExists: TRoom | undefined = this.$store.state.rooms[idRoom];
+                let newRoom: TRoom
+                if (roomExists) {
+                    newRoom = { ...roomExists, id: idRoom, name: this.formJoin.roomName, users: [...(roomExists?.users ?? []), { userName }] }
+                    const userExists = roomExists.users.some(user => user.userName === userName);
+                    if (userExists) {
+                        this.$message({
+                            showClose: true,
+                            message: `${userName} already exists`,
+                            type: 'error'
+                        });
+                        return;
+                    }
+                } else {
+                    newRoom = { id: idRoom, name: this.formJoin.roomName, users: [{ userName }], messages: [] }
+                }
                 this.$store.dispatch('addUserInRoom', newRoom).then(() => {
-                    // if (roomExists) {
-                    //     const channel = new BroadcastChannel(`${CHANNEL_NAME_ROOM}${roomName}`);
-                    //     const dataPostMessage: TMessageBroadCast<{ room: TRoom, userName: string }> = {
-                    //         type: TypeChannelRoom.JOIN,
-                    //         data: { room: newRoom, userName }
-                    //     }
-                    //     channel.postMessage(dataPostMessage)
-                    // } else {
-                    //     const channelRooms = new BroadcastChannel(CHANNEL_NAME_ROOMS)
-                    //     channelRooms.postMessage({
-                    //         type: TypeChannelRooms.ADD,
-                    //         data: newRoom
-                    //     })
-                    // }
                     const channelRooms = new BroadcastChannel(CHANNEL_NAME_ROOMS)
                     channelRooms.postMessage({
                         type: TypeChannelRooms.ADD,
@@ -79,13 +78,10 @@ export default defineComponent({
                     const dataPostMessage: TMessageBroadCast<{ room: TRoom, userName: string }> = {
                         type: TypeChannelRoom.JOIN,
                         data: { room: newRoom, userName }
-                    }
-                    channel.postMessage(dataPostMessage)
-
-                    debugger
-
-                    (this.$router as any).push("/room/" + roomName + "?username=" + userName)
-                        (this.$refs.formJoin as any).resetFields();
+                    };
+                    channel.postMessage(dataPostMessage);
+                    this.$router.push("/room/" + roomName + "?username=" + userName);
+                    (this.$refs?.formJoin as any).resetFields();
                 });
             } catch (error) {
                 console.error('Validation error', error);
