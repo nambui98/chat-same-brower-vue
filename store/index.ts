@@ -37,7 +37,6 @@ export const mutations: MutationTree<RootState> = {
         };
     },
     ADD_MESSAGE_ROOMS(state, { roomId, message }: { roomId: TRoom['id'], message: TMessage }) {
-        debugger
         const currentRoom = state.rooms[roomId];
         state.rooms[roomId] = {
             ...currentRoom,
@@ -46,23 +45,17 @@ export const mutations: MutationTree<RootState> = {
         state.rooms = { ...state.rooms };
     },
     ADD_MESSAGE(state, { roomId, message }) {
-
-        debugger
         state.rooms[roomId].messages.push(message);
         state.rooms = { ...state.rooms };
     },
     LEAVE_ROOM(state, { roomId, user }: { roomId: string, user: TUser }) {
         const users = state.rooms[roomId]?.users.filter(u => u.userName !== user.userName);
-        debugger
         if (state.rooms[roomId]) {
             state.rooms[roomId].users = users;
             if (users.length <= 1) {
-                debugger
                 delete state.rooms[roomId];
             }
-
             state.rooms = { ...state.rooms };
-
         }
     },
 }
@@ -84,7 +77,6 @@ export const actions: ActionTree<RootState, RootState> = {
         commit('ADD_MESSAGE', data)
     },
     leaveRoom({ commit }, data: { user: TUser, roomId: TRoom['id'] }) {
-        debugger
         commit('LEAVE_ROOM', data)
     },
 

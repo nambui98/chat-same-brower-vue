@@ -8,21 +8,14 @@ const broadcastChannelPlugin: Plugin = ({ app }) => {
             const channel = new BroadcastChannel(CHANNEL_NAME_ROOMS)
             channel.addEventListener('message', (event) => {
                 const data: TMessageBroadCastRooms<any> = event.data;
-                // console.log("aaaaaaaaaaaaa");
-
-                // console.log(data);
-
                 switch (data.type) {
                     case TypeChannelRooms.REMOVE:
-                        console.log("remove room :", data.data);
-                        debugger
                         app.store?.dispatch('removeRoom', data.data)
                         break;
                     case TypeChannelRooms.ADD:
                         app.store?.dispatch('addRoom', data.data)
                         break;
                     case TypeChannelRooms.ADD_MESSAGE:
-                        debugger
                         app.store?.dispatch('addMessageRooms', data.data)
                         break;
                     case TypeChannelRooms.USER_LEAVE:

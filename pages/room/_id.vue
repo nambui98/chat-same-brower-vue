@@ -170,11 +170,7 @@ export default defineComponent({
             }
             this.$store.dispatch("leaveRoom", dataChannelRoom.data).then(() => {
                 this.broadcastChannelRoom?.postMessage(dataChannelRoom)
-                console.log(this.usersInRoom);
-
-                debugger
                 if (!this.usersInRoom || (this.usersInRoom && this.usersInRoom?.length <= 1)) {
-                    debugger
                     this.broadcastChannelRooms.postMessage(dataChannelRooms)
                 }
             })

@@ -13,7 +13,6 @@
         </el-form-item>
     </el-form>
 </template>
-  
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { CHANNEL_NAME_ROOM, CHANNEL_NAME_ROOMS, TypeChannelRoom, TypeChannelRooms } from '~/constants';
